@@ -1,0 +1,19 @@
+/* @import url("https://uilight.netlify.app/main.css") layer(uilight); */
+
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons+Outlined");
+
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Roboto', 'Lato', sans-serif !important;
+}
+h1, h2, h3 {
+  font-family: 'Google Sans', sans-serif !important;
+}
+.uilight {
+    all: revert;
+}
