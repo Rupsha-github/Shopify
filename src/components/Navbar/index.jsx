@@ -1,8 +1,10 @@
 import { useState } from "react";
 import favicon4 from "../../assets/favicon4.png";
+import { useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="bg-orange-400 text-neutral-50 relative z-50">
@@ -10,7 +12,7 @@ export const Navbar = () => {
       <div className="flex items-center justify-between px-6 md:px-16 py-4 md:py-6">
         
         {/* Brand */}
-        <div className="flex items-center gap-3">
+        <div onClick={() => navigate('/')} className="flex items-center gap-3 cursor-pointer">
           <img src={favicon4} alt="shopify.com" className="h-8 w-8 md:h-10 md:w-10" />
           <h1 className="text-2xl md:text-3xl font-bold">Shopify</h1>
         </div>
