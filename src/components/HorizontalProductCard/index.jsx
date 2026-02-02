@@ -7,7 +7,7 @@ export const HorizontalProductCard = ({ product }) => {
   const onRemoveFromCartClick = () => {
     cartDispatch({
       type: "REMOVE_FROM_CART",
-      payload: { product },
+      payload: { id : product.id },
     });
     toast.success("Product removed from cart");
   };
