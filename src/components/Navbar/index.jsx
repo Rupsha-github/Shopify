@@ -1,10 +1,11 @@
 import { useState } from "react";
 import favicon4 from "../../assets/favicon4.png";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../context/cart-context"; //
-import { useWishlist } from "../../context/wishlist-context"; //
+import { useCart } from "../../context/cart-context"; 
+import { useWishlist } from "../../context/wishlist-context"; 
+import { SearchBar } from "../SearchBar";
 
-export const Navbar = () => {
+export const Navbar = ({ searchData = [], onSearch = () => {} }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   
@@ -15,7 +16,7 @@ export const Navbar = () => {
   return (
     <header className="bg-orange-400 text-neutral-50 z-50 fixed top-0 left-0 w-full shadow-lg">
       {/* Main Container */}
-      <div className="flex items-center justify-between px-6 md:px-16 py-4 md:py-6">
+      <div className="flex items-center justify-between px-6 md:px-16 py-4 md:py-6 gap-4">
         
         {/* Brand */}
         <div onClick={() => navigate('/')} className="flex items-center gap-3 cursor-pointer">
@@ -23,8 +24,13 @@ export const Navbar = () => {
           <h1 className="text-2xl md:text-3xl font-bold">Shopify</h1>
         </div>
 
+        {/* Search Bar - Center Position */}
+        <div className="flex-1 flex justify-center max-w-lg">
+          <SearchBar data={searchData} onSearch={onSearch} />
+        </div>
+
         {/* Desktop Nav (Hidden on Mobile) */}
-        <nav className="hidden md:flex gap-8 items-center">
+        <nav className="hidden md:flex gap-12 items-center">
           <NavIcon 
             icon="shopping_cart" 
             label="Cart" 
@@ -103,7 +109,7 @@ const NavIcon = ({ icon, label, to, navigate, badgeCount }) => (
     </span>
     {/* Desktop Badge: Absolute positioned top-right */}
     {badgeCount > 0 && (
-      <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] flex items-center justify-center border-2 border-orange-400">
+      <span className="absolute -top-2 -right-3 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] flex items-center justify-center border-2 border-orange-400">
         {badgeCount}
       </span>
     )}
