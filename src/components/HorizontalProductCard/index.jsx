@@ -1,13 +1,20 @@
 import { toast } from "react-toastify";
 import { useCart } from "../../context/cart-context";
+import { useWishlist } from "../../context/wishlist-context";
+import { findProductInWishlist } from "../../utils/findProductInWishlist";
+import { useNavigate } from "react-router-dom";
 
 export const HorizontalProductCard = ({ product }) => {
   const { cartDispatch } = useCart();
+  const { wishlist, wishlistDispatch } = useWishlist();
+  const navigate = useNavigate();
+
+  const isInWishlist = findProductInWishlist(wishlist, product.id);
 
   const onRemoveFromCartClick = () => {
     cartDispatch({
       type: "REMOVE_FROM_CART",
-      payload: { id : product.id },
+      payload: { id: product.id },
     });
     toast.success("Product removed from cart");
   };
@@ -26,12 +33,22 @@ export const HorizontalProductCard = ({ product }) => {
     });
   };
 
+  const onWishlistClick = () => {
+    if (isInWishlist) {
+      // If already in wishlist, navigate to wishlist page
+      navigate("/wishlist");
+    } else {
+      wishlistDispatch({
+        type: "ADD_TO_WISHLIST",
+        payload: { product },
+      });
+      toast.success("Product moved to wishlist");
+    }
+  };
+
   return (
-    // Updated width classes: 
-    // w-full on mobile, lg:w-[80%] on large screens to reduce width as requested
     <div className="flex flex-row shadow-lg rounded-lg overflow-hidden bg-white my-2 lg:w-[80%] lg:h-[14rem] lg:mx-16 md:mx-4 h-[14rem] border border-gray-100 w-full">
-      
-      {/* Image Section: Responsive width */}
+      {/* Image Section */}
       <div className="relative w-[9rem] md:w-[12rem] h-full flex-shrink-0">
         <img
           className="w-full h-full object-cover"
@@ -92,8 +109,19 @@ export const HorizontalProductCard = ({ product }) => {
             </span>
             Remove From Cart
           </button>
-          <button className="flex-1 flex items-center justify-center gap-1 md:gap-2 border border-orange-500 text-orange-500 text-xs md:text-sm font-medium py-1.5 px-2 md:py-2 md:px-4 rounded hover:bg-orange-50 transition-colors">
-            Move To Wishlist
+
+          <button
+            onClick={onWishlistClick}
+            className={`flex-1 flex items-center justify-center gap-1 md:gap-2 border text-xs md:text-sm font-medium py-1.5 px-2 md:py-2 md:px-4 rounded transition-colors ${
+              isInWishlist
+                ? "border-red-500 text-red-500 hover:bg-red-50"
+                : "border-orange-500 text-orange-500 hover:bg-orange-50"
+            }`}
+          >
+            <span className="material-icons-outlined text-xs md:text-base">
+              {isInWishlist ? "arrow_right_alt" : "favorite"}
+            </span>
+            {isInWishlist ? "Go To Wishlist" : "Move to Wishlist"}
           </button>
         </div>
       </div>

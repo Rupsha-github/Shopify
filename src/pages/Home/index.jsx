@@ -7,8 +7,6 @@ import { useCart } from "../../context/cart-context";
 export const Home = () => {
 
     const [products, setProducts] = useState([]);
-    const { cart } = useCart();
-    console.log({cart});
     
     useEffect(() => {
         (async() => {
@@ -20,7 +18,7 @@ export const Home = () => {
     return (
         <>
             <Navbar />
-            <main className="flex flex-wrap gap-8 justify-center pt-8">
+            <main className="flex flex-wrap gap-8 justify-center pt-32">
                 {
                     products?.length > 0 && products.map((product) => (
                         <ProductCard key={product.id} product={product} />
