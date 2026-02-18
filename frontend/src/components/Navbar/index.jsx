@@ -32,6 +32,12 @@ export const Navbar = ({ searchData = [], onSearch = () => {} }) => {
         {/* Desktop Nav (Hidden on Mobile) */}
         <nav className="hidden md:flex gap-12 items-center">
           <NavIcon 
+            icon="home" 
+            label="Home" 
+            to="/" 
+            navigate={navigate} 
+          />
+          <NavIcon 
             icon="shopping_cart" 
             label="Cart" 
             to="/cart" 
@@ -71,6 +77,12 @@ export const Navbar = ({ searchData = [], onSearch = () => {} }) => {
         }`}
       >
         <div className="flex flex-col py-4">
+          <MobileNavItem 
+            icon="home" 
+            label="Home" 
+            to="/" 
+            navigate={navigate} 
+          />
           <MobileNavItem 
             icon="shopping_cart" 
             label="Cart" 
