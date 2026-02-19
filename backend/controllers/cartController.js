@@ -2,7 +2,7 @@ import User from "../models/User.js";
 
 export const getCart = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).populate("cart.product");
+    const user = await User.findById(req.user.id).populate("cart.product");
     // Filter out any null products (deleted items)
     const validCart = user.cart.filter((item) => item.product !== null);
     const cartItems = validCart.map((item) => ({
@@ -18,7 +18,7 @@ export const getCart = async (req, res) => {
 export const addToCart = async (req, res) => {
   const { productId } = req.body;
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user.id);
     const itemExists = user.cart.find(
       (item) => item.product.toString() === productId,
     );
@@ -30,7 +30,7 @@ export const addToCart = async (req, res) => {
     }
     await user.save();
 
-    const updatedUser = await User.findById(req.user._id).populate(
+    const updatedUser = await User.findById(req.user.id).populate(
       "cart.product",
     );
     const cartItems = updatedUser.cart
@@ -45,13 +45,13 @@ export const addToCart = async (req, res) => {
 
 export const removeFromCart = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user.id);
     user.cart = user.cart.filter(
       (item) => item.product.toString() !== req.params.id,
     );
     await user.save();
 
-    const updatedUser = await User.findById(req.user._id).populate(
+    const updatedUser = await User.findById(req.user.id).populate(
       "cart.product",
     );
     const cartItems = updatedUser.cart
