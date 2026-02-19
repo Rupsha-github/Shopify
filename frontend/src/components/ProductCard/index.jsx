@@ -10,26 +10,26 @@ export const ProductCard = ({ product }) => {
   const navigate = useNavigate();
 
   const isProductInCart = findProductInCart(cart, product.id);
-  const isProductInWishlist = wishlist?.some((item) => item.id === product.id);
+  const isProductInWishlist = wishlist?.some((item) => item._id === product._id);
 
-  const onAddToCartClick = (product) => {
-    cartDispatch({
+  const onAddToCartClick = async (product) => {
+    await cartDispatch({
       type: "ADD_TO_CART",
       payload: { product },
     });
     toast.success("Product added to cart!");
   };
 
-  const onAddToWishlistClick = (product) => {
-    wishlistDispatch({
+  const onAddToWishlistClick = async (product) => {
+    await wishlistDispatch({
       type: "ADD_TO_WISHLIST",
       payload: { product },
     });
     toast.success("Product added to wishlist!");
   };
 
-  const onRemoveFromWishlistClick = (id) => {
-    wishlistDispatch({
+  const onRemoveFromWishlistClick = async (id) => {
+    await wishlistDispatch({
       type: "REMOVE_FROM_WISHLIST",
       payload: { id },
     });
@@ -74,7 +74,7 @@ export const ProductCard = ({ product }) => {
           <button
             onClick={() =>
               isProductInWishlist
-                ? onRemoveFromWishlistClick(product.id)
+                ? onRemoveFromWishlistClick(product._id)
                 : onAddToWishlistClick(product)
             }
             className={`w-16 flex items-center justify-center transition-colors rounded-bl-lg border-r border-gray-200 ${

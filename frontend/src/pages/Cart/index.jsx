@@ -37,7 +37,7 @@ export const Cart = () => {
           <div className="flex flex-col gap-4 w-full lg:flex-1 md:ml-4">
             {filteredCart?.length > 0 ? (
               filteredCart.map((product) => (
-                <HorizontalProductCard key={product.id} product={product} />
+                <HorizontalProductCard key={product._id} product={product} />
               ))
             ) : (
               <>

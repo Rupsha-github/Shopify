@@ -1,6 +1,6 @@
 import { Navbar } from "../../components/Navbar";
 import { useEffect, useState } from "react";
-import { getAllProducts } from "../../api/getAllProducts";
+import { getAllProducts } from "../../api/products";
 import { ProductCard } from "../../components/ProductCard";
 
 export const Home = () => {
@@ -9,9 +9,13 @@ export const Home = () => {
 
   useEffect(() => {
     (async () => {
-      const data = await getAllProducts();
-      setProducts(data);
-      setFilteredProducts(data); // Initialize filtered list with all products
+      try {
+        const data = await getAllProducts();
+        setProducts(data);
+        setFilteredProducts(data); // Initialize filtered list with all products
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
     })();
   }, []);
 

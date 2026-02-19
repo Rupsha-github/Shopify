@@ -9,12 +9,12 @@ export const HorizontalProductCard = ({ product }) => {
   const { wishlist, wishlistDispatch } = useWishlist();
   const navigate = useNavigate();
 
-  const isInWishlist = findProductInWishlist(wishlist, product.id);
+  const isInWishlist = findProductInWishlist(wishlist, product._id);
 
   const onRemoveFromCartClick = () => {
     cartDispatch({
       type: "REMOVE_FROM_CART",
-      payload: { id: product.id },
+      payload: { id: product._id },
     });
     toast.success("Product removed from cart");
   };
@@ -22,14 +22,14 @@ export const HorizontalProductCard = ({ product }) => {
   const handleIncrement = () => {
     cartDispatch({
       type: "INCREMENT_QUANTITY",
-      payload: { id: product.id },
+      payload: { id: product._id },
     });
   };
 
   const handleDecrement = () => {
     cartDispatch({
       type: "DECREMENT_QUANTITY",
-      payload: { id: product.id },
+      payload: { id: product._id },
     });
   };
 

@@ -7,7 +7,7 @@ export const WishlistProductCard = ({ product }) => {
   const onRemoveFromWishlistClick = (product) => {
     wishlistDispatch({
       type: "REMOVE_FROM_WISHLIST",
-      payload: { id: product.id },
+      payload: { id: product._id },
     });
     toast.success("Product removed from wishlist!");
   };
