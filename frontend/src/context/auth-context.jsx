@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { createContext, useContext, useState, useEffect } from "react";
 import apiClient from "../api/axios";
 import { useNavigate } from "react-router-dom";
@@ -35,11 +36,13 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (username, email, password) => {
     try {
-      const { data } = await apiClient.post("/auth/signup", {
+      await apiClient.post("/auth/signup", {
         username,
         email,
         password,
       });
+      toast.success("Signup successful! Please login.");
+      navigate("/login");
       return { success: true };
     } catch (error) {
       return {

@@ -9,31 +9,37 @@ export const ProductCard = ({ product }) => {
   const { wishlist, wishlistDispatch } = useWishlist();
   const navigate = useNavigate();
 
-  const isProductInCart = findProductInCart(cart, product.id);
-  const isProductInWishlist = wishlist?.some((item) => item._id === product._id);
+  const isProductInCart = findProductInCart(cart, product._id);
+  const isProductInWishlist = wishlist?.filter(Boolean).some((item) => item._id === product._id);
 
   const onAddToCartClick = async (product) => {
-    await cartDispatch({
+    const success = await cartDispatch({
       type: "ADD_TO_CART",
       payload: { product },
     });
-    toast.success("Product added to cart!");
+    if (success) {
+      toast.success("Product added to cart!");
+    }
   };
 
   const onAddToWishlistClick = async (product) => {
-    await wishlistDispatch({
+    const success = await wishlistDispatch({
       type: "ADD_TO_WISHLIST",
       payload: { product },
     });
-    toast.success("Product added to wishlist!");
+    if (success) {
+      toast.success("Product added to wishlist!");
+    }
   };
 
   const onRemoveFromWishlistClick = async (id) => {
-    await wishlistDispatch({
+    const success = await wishlistDispatch({
       type: "REMOVE_FROM_WISHLIST",
       payload: { id },
     });
-    toast.success("Product removed from wishlist!");
+    if (success) {
+      toast.success("Product removed from wishlist!");
+    }
   };
 
   return (

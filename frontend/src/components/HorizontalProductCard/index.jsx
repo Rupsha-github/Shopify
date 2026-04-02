@@ -1,7 +1,6 @@
 import { toast } from "react-toastify";
 import { useCart } from "../../context/cart-context";
 import { useWishlist } from "../../context/wishlist-context";
-import { findProductInWishlist } from "../../utils/findProductInWishlist";
 import { useNavigate } from "react-router-dom";
 
 export const HorizontalProductCard = ({ product }) => {
@@ -9,12 +8,15 @@ export const HorizontalProductCard = ({ product }) => {
   const { wishlist, wishlistDispatch } = useWishlist();
   const navigate = useNavigate();
 
-  const isInWishlist = findProductInWishlist(wishlist, product._id);
+  // SAFTEY FIX: Added "item &&" to prevent crashes if an item is null
+  const isInWishlist = wishlist?.some(
+    (item) => item && (item._id === product._id || item.id === product.id)
+  );
 
   const onRemoveFromCartClick = () => {
     cartDispatch({
       type: "REMOVE_FROM_CART",
-      payload: { id: product._id },
+      payload: { product }, 
     });
     toast.success("Product removed from cart");
   };
@@ -22,27 +24,35 @@ export const HorizontalProductCard = ({ product }) => {
   const handleIncrement = () => {
     cartDispatch({
       type: "INCREMENT_QUANTITY",
-      payload: { id: product._id },
+      payload: { product },
     });
   };
 
   const handleDecrement = () => {
     cartDispatch({
       type: "DECREMENT_QUANTITY",
-      payload: { id: product._id },
+      payload: { product },
     });
   };
 
-  const onWishlistClick = () => {
+  const onWishlistClick = async () => {
     if (isInWishlist) {
-      // If already in wishlist, navigate to wishlist page
       navigate("/wishlist");
     } else {
-      wishlistDispatch({
+      // 1. Add to Wishlist
+      const success = await wishlistDispatch({
         type: "ADD_TO_WISHLIST",
         payload: { product },
       });
-      toast.success("Product moved to wishlist");
+      
+      // 2. Remove from Cart (since it's a "Move")
+      if (success) {
+        cartDispatch({
+          type: "REMOVE_FROM_CART",
+          payload: { product },
+        });
+        toast.success("Product moved to wishlist");
+      }
     }
   };
 

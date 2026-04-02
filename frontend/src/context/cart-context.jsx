@@ -29,7 +29,7 @@ export const CartProvider = ({ children }) => {
   const cartDispatch = async (action) => {
     if (!token) {
       toast.info("Please login to use the cart");
-      return;
+      return false;
     }
 
     try {
@@ -64,16 +64,18 @@ export const CartProvider = ({ children }) => {
             toast.info(
               "Quantity update not fully supported in this demo version",
             );
-            return;
+            return false;
           }
           setCart(response.data);
           break;
         default:
-          break;
+          return false;
       }
+      return true;
     } catch (error) {
       console.error("Cart Action Failed", error);
       toast.error("Action failed");
+      return false;
     }
   };
 

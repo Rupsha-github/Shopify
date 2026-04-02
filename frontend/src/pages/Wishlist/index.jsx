@@ -19,7 +19,7 @@ export const Wishlist = () => {
           <div className="flex flex-wrap gap-4 w-full justify-evenly flex-1">
             {wishlist?.length > 0 ? (
               wishlist.map((product) => (
-                <WishlistProductCard key={product.id} product={product} />
+                <WishlistProductCard key={product._id} product={product} />
               ))
             ) : (
               <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg shadow-sm w-full">

@@ -1,1 +1,1 @@
-export const findProductInWishlist = (wishlist, id) => wishlist?.length > 0 && wishlist.some(product => product.id === id); 
+export const findProductInWishlist = (wishlist, id) => wishlist?.filter(Boolean).some(product => product._id === id);

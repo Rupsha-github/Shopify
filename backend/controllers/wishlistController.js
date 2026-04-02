@@ -1,55 +1,60 @@
-import User from "../models/User.js";
+import User from '../models/User.js';
 
 // @desc    Get user wishlist
-// @route   GET /api/wishlist
 export const getWishlist = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).populate("wishlist.product");
-    const wishlistItems = user.wishlist.map(item => item.product);
-    res.json(wishlistItems);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error" });
-  }
+    try {
+        const user = await User.findById(req.user._id).populate('wishlist');
+        // Filter out nulls in case a product was deleted from DB
+        const validWishlist = user.wishlist.filter(item => item !== null);
+        res.json(validWishlist);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
 };
 
 // @desc    Add item to wishlist
-// @route   POST /api/wishlist
 export const addToWishlist = async (req, res) => {
-  const { productId } = req.body;
-  try {
-    const user = await User.findById(req.user.id);
-
-    // Check if product already in wishlist
-    const isProductInWishlist = user.wishlist.some(item => item.product.toString() === productId);
-
-    if (!isProductInWishlist) {
-      user.wishlist.push({ product: productId });
-      await user.save();
+    const { productId } = req.body;
+    
+    if (!productId) {
+        return res.status(400).json({ message: 'Product ID is required' });
     }
 
-    const updatedUser = await User.findById(req.user.id).populate("wishlist.product");
-    const wishlistItems = updatedUser.wishlist.map(item => item.product);
-    res.json(wishlistItems);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error" });
-  }
+    try {
+        const user = await User.findById(req.user._id);
+        
+        // Safely check if product already in wishlist using .toString()
+        const alreadyExists = user.wishlist.some(id => id.toString() === productId);
+        
+        if (!alreadyExists) {
+            user.wishlist.push(productId);
+            await user.save();
+        }
+        
+        const updatedUser = await User.findById(req.user._id).populate('wishlist');
+        const validWishlist = updatedUser.wishlist.filter(item => item !== null);
+        
+        res.json(validWishlist);
+    } catch (error) {
+        console.error("Add to wishlist error:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
 };
 
 // @desc    Remove item from wishlist
-// @route   DELETE /api/wishlist/:id
 export const removeFromWishlist = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-
-    user.wishlist = user.wishlist.filter(
-      (item) => item.product.toString() !== req.params.id,
-    );
-    await user.save();
-
-    const updatedUser = await User.findById(req.user.id).populate("wishlist.product");
-    const wishlistItems = updatedUser.wishlist.map(item => item.product);
-    res.json(wishlistItems);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error" });
-  }
+    try {
+        const user = await User.findById(req.user._id);
+        
+        // Safely filter out the ID
+        user.wishlist = user.wishlist.filter(id => id.toString() !== req.params.id);
+        await user.save();
+        
+        const updatedUser = await User.findById(req.user._id).populate('wishlist');
+        const validWishlist = updatedUser.wishlist.filter(item => item !== null);
+        
+        res.json(validWishlist);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
 };
