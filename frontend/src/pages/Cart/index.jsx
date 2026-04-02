@@ -36,8 +36,12 @@ export const Cart = () => {
           {/* Left Column: Cart Items List */}
           <div className="flex flex-col gap-4 w-full lg:flex-1 md:ml-4">
             {filteredCart?.length > 0 ? (
+              // FIX: Removed the extra {} around filteredCart.map
               filteredCart.map((product) => (
-                <HorizontalProductCard key={product._id} product={product} />
+                <HorizontalProductCard
+                  key={product._id || product.id}
+                  product={product}
+                />
               ))
             ) : (
               <>

@@ -1,1 +1,3 @@
-export const findProductInCart = (cart, id) => cart?.filter(Boolean).find(product => product._id === id);
+export const findProductInCart = (cart, targetId) => {
+    return cart?.some(item => item && (item._id === targetId || item.id === targetId));
+};

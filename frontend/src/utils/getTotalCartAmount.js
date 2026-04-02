@@ -1,6 +1,6 @@
-export const getTotalCartAmount = (cart) =>
-  cart?.length > 0 &&
-  cart.reduce(
-    (total, product) => total + product.price * (product.quantity || 1),
-    0
-  );
+export const getTotalCartAmount = (cart) => {
+    return cart?.reduce((total, item) => {
+        if (!item) return total;
+        return total + (item.price * (item.quantity || 1));
+    }, 0) || 0;
+};

@@ -8,7 +8,7 @@ export const HorizontalProductCard = ({ product }) => {
   const { wishlist, wishlistDispatch } = useWishlist();
   const navigate = useNavigate();
 
-  // SAFTEY FIX: Added "item &&" to prevent crashes if an item is null
+  // SAFELY check for the product in the wishlist using the MongoDB _id
   const isInWishlist = wishlist?.some(
     (item) => item && (item._id === product._id || item.id === product.id)
   );
@@ -16,7 +16,7 @@ export const HorizontalProductCard = ({ product }) => {
   const onRemoveFromCartClick = () => {
     cartDispatch({
       type: "REMOVE_FROM_CART",
-      payload: { product }, 
+      payload: { product }, // FIX: Pass the whole product object
     });
     toast.success("Product removed from cart");
   };
@@ -24,14 +24,14 @@ export const HorizontalProductCard = ({ product }) => {
   const handleIncrement = () => {
     cartDispatch({
       type: "INCREMENT_QUANTITY",
-      payload: { product },
+      payload: { product }, // FIX: Pass the whole product object
     });
   };
 
   const handleDecrement = () => {
     cartDispatch({
       type: "DECREMENT_QUANTITY",
-      payload: { product },
+      payload: { product }, // FIX: Pass the whole product object
     });
   };
 
@@ -39,13 +39,13 @@ export const HorizontalProductCard = ({ product }) => {
     if (isInWishlist) {
       navigate("/wishlist");
     } else {
-      // 1. Add to Wishlist
+      // 1. Await adding to Wishlist
       const success = await wishlistDispatch({
         type: "ADD_TO_WISHLIST",
-        payload: { product },
+        payload: { product }, // FIX: Pass the whole product object
       });
       
-      // 2. Remove from Cart (since it's a "Move")
+      // 2. If successfully added to wishlist, remove it from the cart
       if (success) {
         cartDispatch({
           type: "REMOVE_FROM_CART",

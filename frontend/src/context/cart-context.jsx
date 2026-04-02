@@ -9,23 +9,21 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const { token } = useAuth();
 
-  // Fetch Cart on Load
   useEffect(() => {
     if (token) {
       (async () => {
         try {
           const { data } = await apiClient.get("/cart");
-          setCart(data);
+          setCart(data || []);
         } catch (error) {
           console.error("Failed to fetch cart", error);
         }
       })();
     } else {
-      setCart([]); // Clear cart on logout
+      setCart([]);
     }
   }, [token]);
 
-  // Cart Dispatcher for Components (Compatible interface)
   const cartDispatch = async (action) => {
     if (!token) {
       toast.info("Please login to use the cart");
@@ -34,39 +32,27 @@ export const CartProvider = ({ children }) => {
 
     try {
       let response;
+      // Extract the correct ID safely
+      const targetId = action.payload?.product?._id || action.payload?._id;
+
+      if (!targetId) {
+        console.error("Invalid Cart Payload: Missing _id", action.payload);
+        toast.error("Error: Missing Database ID. Try refreshing.");
+        return false;
+      }
+
       switch (action.type) {
         case "ADD_TO_CART":
-          response = await apiClient.post("/cart", {
-            productId: action.payload.product._id,
-          });
+        case "INCREMENT_QUANTITY":
+          response = await apiClient.post("/cart", { productId: targetId });
           setCart(response.data);
           break;
         case "REMOVE_FROM_CART":
-          response = await apiClient.delete(
-            `/cart/${action.payload.product ? action.payload.product.id : action.payload.id}`,
-          );
+          response = await apiClient.delete(`/cart/${targetId}`);
           setCart(response.data);
           break;
-        case "INCREMENT_QUANTITY":
         case "DECREMENT_QUANTITY":
-          // Using add to cart for increment (backend handles logic) or custom endpoints
-          // For simplicity, re-adding increments. For decrement, we might need a specific endpoint or just ignore if simplified.
-          // Assuming backend addToCart handles increment.
-          if (action.type === "INCREMENT_QUANTITY") {
-            response = await apiClient.post("/cart", {
-              productId: action.payload.id,
-            });
-          } else {
-            // For simplicity, we are deleting and re-adding, OR you can create a specific decrement endpoint on backend
-            // Let's assume user manually removes.
-            // Ideally: await apiClient.post(`/cart/decrement`, ...);
-            // Current backend: addToCart increments. removeFromCart removes entirely.
-            toast.info(
-              "Quantity update not fully supported in this demo version",
-            );
-            return false;
-          }
-          setCart(response.data);
+          toast.info("Decrement not fully supported yet.");
           break;
         default:
           return false;
@@ -74,7 +60,7 @@ export const CartProvider = ({ children }) => {
       return true;
     } catch (error) {
       console.error("Cart Action Failed", error);
-      toast.error("Action failed");
+      toast.error("Server error updating cart.");
       return false;
     }
   };

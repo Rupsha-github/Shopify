@@ -14,7 +14,7 @@ export const WishlistProvider = ({ children }) => {
       (async () => {
         try {
           const { data } = await apiClient.get("/wishlist");
-          setWishlist(data);
+          setWishlist(data || []);
         } catch (error) {
           console.error("Failed to fetch wishlist", error);
         }
@@ -32,37 +32,31 @@ export const WishlistProvider = ({ children }) => {
 
     try {
       let response;
-      
-      // Safely extract the MongoDB _id
-      const targetId = action.payload.product?._id || action.payload._id;
+      // Extract the correct ID safely
+      const targetId = action.payload?.product?._id || action.payload?._id;
+
+      if (!targetId) {
+        console.error("Invalid Wishlist Payload: Missing _id", action.payload);
+        toast.error("Error: Missing Database ID. Try refreshing.");
+        return false;
+      }
 
       switch (action.type) {
         case "ADD_TO_WISHLIST":
-          if (!targetId) {
-            console.error("Cannot add: Missing MongoDB _id on product", action.payload);
-            toast.error("Database ID error. Try refreshing the page.");
-            return false;
-          }
           response = await apiClient.post("/wishlist", { productId: targetId });
           setWishlist(response.data);
           break;
-
         case "REMOVE_FROM_WISHLIST":
-          if (!targetId) {
-             console.error("Cannot remove: Missing MongoDB _id", action.payload);
-             return false;
-          }
           response = await apiClient.delete(`/wishlist/${targetId}`);
           setWishlist(response.data);
           break;
-
         default:
           return false;
       }
       return true;
     } catch (error) {
-      console.error("Wishlist Action Failed:", error.response?.data || error.message);
-      toast.error("Action failed on server");
+      console.error("Wishlist Action Failed", error);
+      toast.error("Server error updating wishlist.");
       return false;
     }
   };

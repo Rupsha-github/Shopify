@@ -1,49 +1,98 @@
-import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../../context/cart-context";
 import { useWishlist } from "../../context/wishlist-context";
+import { toast } from "react-toastify";
 
 export const WishlistProductCard = ({ product }) => {
+  const { cart, cartDispatch } = useCart();
   const { wishlistDispatch } = useWishlist();
+  const navigate = useNavigate();
 
-  const onRemoveFromWishlistClick = (product) => {
+  // DEFENSIVE SHIELD: If the product is undefined, a string, or completely empty, render nothing.
+  if (!product || typeof product === 'string') return null;
+
+  const isInCart = cart?.some(
+    (item) => item && (item._id === product._id || item.id === product.id)
+  );
+
+  const onRemoveClick = () => {
     wishlistDispatch({
       type: "REMOVE_FROM_WISHLIST",
-      payload: { id: product._id },
+      payload: { product },
     });
-    toast.success("Product removed from wishlist!");
+    toast.success("Removed from wishlist");
+  };
+
+  const onAddToCartClick = async () => {
+    if (isInCart) {
+      navigate("/cart");
+    } else {
+      const success = await cartDispatch({
+        type: "ADD_TO_CART",
+        payload: { product },
+      });
+      
+      if (success !== false) { 
+        wishlistDispatch({
+          type: "REMOVE_FROM_WISHLIST",
+          payload: { product },
+        });
+        toast.success("Moved to cart");
+      }
+    }
   };
 
   return (
-    <div className="w-72 h-[400px] m-4 flex flex-col relative shadow-lg rounded-lg bg-white overflow-hidden">
-      {/* Image */}
-      <div className="w-full h-80 rounded-t-lg overflow-hidden relative group">
-        <img
-          src={product.images[0]}
-          srcSet={`${product.images[0]}?w=400 400w, ${product.images[0]}?w=800 800w`}
-          sizes="(max-width: 768px) 400px, 800px"
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          alt={product.title}
-        />
+    <div className="w-64 border border-gray-200 rounded-lg shadow-sm overflow-hidden bg-white flex flex-col hover:shadow-lg transition-shadow relative">
+      {/* Remove from Wishlist Button */}
+      <button 
+        onClick={onRemoveClick}
+        className="absolute top-2 right-2 z-10 p-1 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:scale-110 hover:text-red-500 transition-all text-gray-500"
+        title="Remove from Wishlist"
+      >
+        <span className="material-icons-outlined text-xl">delete</span>
+      </button>
+
+      {/* Product Image or Native Fallback */}
+      <div className="relative h-64 overflow-hidden bg-gray-100 flex items-center justify-center">
+        {product?.images?.[0] ? (
+          <img 
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
+            src={product.images[0]} 
+            alt={product.title || "Product"} 
+          />
+        ) : (
+          // NATIVE FALLBACK: Uses your existing Material Icons instead of an external URL
+          <div className="flex flex-col items-center text-gray-400">
+            <span className="material-icons-outlined text-5xl mb-2">image_not_supported</span>
+            <span className="text-sm font-medium">No Image Available</span>
+          </div>
+        )}
       </div>
 
-      {/* Details */}
-      <div className="flex flex-col justify-between flex-grow mt-4">
-        <div>
-          <h2 className="text-base font-semibold text-gray-800 truncate pl-4">
-            {product.title}
-          </h2>
-          <p className="text-gray-600 pl-4 pb-2">&#x20B9; {product.price}</p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex mt-auto">
-          {/* Wishlist Button */}
+      {/* Product Details */}
+      <div className="p-4 flex flex-col flex-grow">
+        <h2 className="text-lg font-bold text-gray-800 line-clamp-1 mb-1" title={product?.title}>
+          {product?.title || "Unknown Product"}
+        </h2>
+        <p className="text-gray-600 text-sm mb-4 font-semibold">
+          &#x20B9; {product?.price || 0}
+        </p>
+        
+        {/* Actions */}
+        <div className="mt-auto">
           <button
-            onClick={() => onRemoveFromWishlistClick(product)}
-            className="w-full flex items-center justify-center gap-2 font-medium py-2 px-4 transition-colors rounded-b-lg bg-red-500 text-white hover:bg-red-600"
-            title="Remove from Wishlist"
+            onClick={onAddToCartClick}
+            className={`w-full py-2.5 rounded font-medium transition-colors flex items-center justify-center gap-2 ${
+              isInCart 
+                ? "bg-green-500 hover:bg-green-600 text-white" 
+                : "bg-orange-500 hover:bg-orange-600 text-white"
+            }`}
           >
-            <span className="material-icons-outlined">delete</span>
-            Remove From Wishlist
+            <span className="material-icons-outlined text-lg">
+              {isInCart ? "shopping_cart_checkout" : "add_shopping_cart"}
+            </span>
+            {isInCart ? "Go to Cart" : "Move to Cart"}
           </button>
         </div>
       </div>
